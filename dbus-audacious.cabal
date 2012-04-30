@@ -1,0 +1,22 @@
+Name:              dbus-audacious
+Version:           0.1
+Description:       DBus interface to audacious
+License:           BSD3
+License-file:      LICENSE
+Author:            Ben Wolfson
+Maintainer:        wolfson@gmail.com
+Build-Type:        Simple
+Cabal-Version:     >=1.10
+
+Library
+        Hs-source-dirs:       src
+        Build-Depends:  base >= 3 && < 5,
+                        dbus-core >= 0.9,
+                        directory >= 1,
+                        filepath >= 1,
+                        mtl >= 1,
+                        unix >= 2.5,
+                        network >= 2,
+                        containers >= 0.4
+        Exposed-modules:    DBus.Audacious
+        Default-language: Haskell2010
