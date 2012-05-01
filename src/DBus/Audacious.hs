@@ -58,8 +58,8 @@
 -- >    liftIO $ forkIO (threadDelay micros >> withPlayer p stop) 
 -- 
 -- Note that the names of the functions exposed by this module do not
--- -- always directly correspond to the names of the methods exposed
--- over -- dbus, in large part because the latter seem to be highly
+-- always directly correspond to the names of the methods exposed
+-- over dbus, in large part because the latter seem to be highly
 -- non-systematic. Some derived functions are included.
 --------------------------------------------------
 module DBus.Audacious
