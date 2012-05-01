@@ -91,14 +91,13 @@ module DBus.Audacious
 
      -- * query the playlist
      getMetadata, getMetadataString, getMetadataAtString, getMetadataAt, 
-     getCurrentTrack, getLength,
+     getCurrentTrack, playlistLength, getActivePlaylistName,
 
      -- * query the player
 
      getStatus, getCaps, getVolume, getChannelVolume, mainWinVisible,
      playing, paused, stopped, repeating, autoAdvance, shuffle, stopAfter,
-     getActivePlaylistName, info, getInfo, status, time, 
-     playlistLength, balance, songFilename, songTitle, songFrames, 
+     info, status, time, balance, songFilename, songTitle, songFrames, 
      songLength, songTuple, remaining,
 
       -- * manipulate the tracklist
@@ -259,7 +258,8 @@ data PlayerCall = Next | Prev | Pause | Stop | Play | VolumeGet
                 | Repeat | VolumeSet | PositionSet | GetStatus | GetCaps 
                 | GetMetadata
                   deriving Show
-data TracklistCall = GetCurrentTrack | GetMetadataAt | GetLength | AddTrack
+-- omitted: GetLength (equivalent to Length)
+data TracklistCall = GetCurrentTrack | GetMetadataAt  | AddTrack
                    | DelTrack | Loop | Random
                      deriving Show
 -- omitted: Play, Pause, Stop (redundant); Position (equivalent to
@@ -495,7 +495,6 @@ getMetadataString :: Aud (M.Map String String)
 -- to strings.
 getMetadataString = fmap (M.map (either show id)) getMetadata
 
-getLength ::  Aud Int32
 getCurrentTrack :: Aud Int32
 -- | 'getCurrentTrack' returns the position in the playlist of the
 -- current track as an 'Int32'.
@@ -504,10 +503,6 @@ getCurrentTrackM :: (MonadError String m) => Aud (m Int32)
 getCurrentTrackM = do
   c <- getCurrentTrack
   return $ if c < 0 then throwError "getCurrentTrack" else return c
-
--- | 'getLength' returns the number of entries in the current
--- playlist. It is identical to 'playlistLength'.
-getLength = playlistLength
 
 -- | 'getMetadataAt' gives the metadata of the track at the indicated
 -- index. The following are equivalent:
@@ -557,12 +552,11 @@ getChannelVolume = do
   return (leftvol, rightvol)
 
 -- | 'info' gives the rate, frequency, and number of channels
--- for the current track. 'getInfo' is a synonym.
+-- for the current track.
 info :: Aud PlayerInfo
 info = do
   [rate, freq, nch] <- callNoarg Info >>= extractmany
   return PlayerInfo {rate, freq, nch}
-getInfo = info -- why two?
 
 -- | 'getTupleFields' gives a list of fields that can (theoretically!)
 -- be used with 'songTuple'. Note that not /every/ song will actually
@@ -590,7 +584,7 @@ playlistLength :: Aud Int32
 balance :: Aud Int32
 -- | 'balance' gives the volume balance of the player.
 balance = get1 Balance
--- | 'playlistLength': see 'getLength'.
+-- | 'playlistLength' returns the number of entries in the current playlist.
 playlistLength = get1 Length
 
 
