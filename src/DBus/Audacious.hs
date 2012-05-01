@@ -418,7 +418,7 @@ setRepeat  :: Bool -> Aud ()
 setRepeat = send1 Loop
 
 setByToggle :: Aud Bool -> Aud () -> Bool -> Aud ()
-setByToggle q set enable = q >>= \enabled -> when (enable == enabled) set
+setByToggle q toggle enable = q >>= \enabled -> when (enable /= enabled) toggle
 
 setStopAfter :: Bool -> Aud ()
 setStopAfter = setByToggle stopAfter toggleStopAfter
