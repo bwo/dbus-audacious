@@ -105,7 +105,7 @@ module DBus.Audacious
       addTrack, delTrack, jump, playlistAdd, add, addUrl,
       addList, openList, openListToTemp, clear, playlistInsUrlString,
 
-      -- * Queue information/manipualtion
+      -- * Queue information/manipulation
        
       queueClear, queueAdd, queueRemove, queueLength,
       isQueued, queueGetQueuePos, queueGetListPos, 
