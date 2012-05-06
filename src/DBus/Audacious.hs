@@ -52,8 +52,9 @@
 -- To stop playing after the current track and all queued tracks have
 -- played, doing this in a different thread:
 -- 
--- > p <- player withPlayer p $ do 
--- >    t <- (+) <$> remaining <*> (fmap sum (allQueuePos >>= mapM songFrames)) 
+-- > p <- player
+-- > withPlayer p $ do
+-- >    t <- (+) <$> remaining <*> (fmap sum (allQueuePos >>= mapM songFrames))
 -- >    let micros = 1000 * fromIntegral t
 -- >    liftIO $ forkIO (threadDelay micros >> withPlayer p stop) 
 -- 
