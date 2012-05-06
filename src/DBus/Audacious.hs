@@ -127,7 +127,7 @@ module DBus.Audacious
             
 import qualified Data.Map as M
 import Network.URI
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, fromMaybe)
 import Data.String
 import Data.Int (Int32)
 import Data.Word (Word32)
@@ -212,6 +212,17 @@ runAud' a = player >>= runAud a
 withPlayer :: Player -> Aud a -> IO a
 withPlayer = flip runAud
 
+idFile :: IO (Maybe FilePath)
+idFile = do
+  let varfn = "/var/lib/dbus/machine-id"
+      etcfn = "/etc/machine-id"
+  var <- doesFileExist varfn
+  etc <- doesFileExist etcfn
+  case (etc,var) of
+    (True,_) -> return $ Just etcfn
+    (_,True) -> return $ Just varfn
+    otherwise -> return Nothing
+
 ensureEnv :: IO ()
 ensureEnv = do
   s <- DBus.Address.getSession
@@ -219,7 +230,8 @@ ensureEnv = do
     Just _ -> return ()
     Nothing ->  do
           x <- liftM (maybe "" (('-':).drop 1)) (getEnv "DISPLAY")
-          id <- withFile "/var/lib/dbus/machine-id" ReadMode hGetLine
+          idfn <- fromMaybe "/dev/null" <$> idFile
+          id <- withFile idfn ReadMode hGetLine
           sessiondir <- fmap (</> ".dbus" </> "session-bus") getHomeDirectory
           e <- doesDirectoryExist sessiondir
           when e $ do
