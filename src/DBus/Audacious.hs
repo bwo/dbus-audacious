@@ -158,11 +158,7 @@ audmain = fromString "org.atheme.audacious"
 
 data Player = Player {mainwin :: Proxy, playerobj :: Proxy, tracklist :: Proxy }
 
-newtype AudR r a = AudR (ReaderT r IO a) deriving (MonadIO, Monad, Functor, Applicative)
-type Aud = AudR Player
-instance MonadReader r (AudR r) where -- can't be derived automatically
-    ask = AudR $ ReaderT return
-    local f (AudR m) = AudR $ ReaderT $ \r -> runReaderT m (f r)
+newtype Aud a = Aud (ReaderT Player IO a) deriving (MonadIO, Monad, Functor, Applicative, MonadReader Player)
 
 -- The advantage of the above monad stack is that *within* Aud
 -- computations, one needn't thread a Player object through; that is,
@@ -201,7 +197,7 @@ instance MonadReader r (AudR r) where -- can't be derived automatically
 -- | 'runAud' runs a computation with the provided 'Player', returning
 -- the result in the IO monad.
 runAud :: Aud a -> Player -> IO a
-runAud (AudR m) = runReaderT m
+runAud (Aud m) = runReaderT m
 
 -- | 'runAud'' runs the computation after getting a 'Player' object
 -- by calling 'player'. This results in greater local network traffic
@@ -811,7 +807,7 @@ enqueueToTemp = send1 PlaylistEnqueueToTemp
 allQueuePos :: Aud [Int32]
 -- | 'allQueuePos' gives the playlist positions of all enqueued
 -- tracks.
-allQueuePos = queueLength >>= \l -> forM [0 .. l -1 ] queueGetListPos
+allQueuePos = queueLength >>= \l -> forM [0 .. l - 1] queueGetListPos
 
 -- global things
 
